@@ -1,4 +1,5 @@
 require('./config');
+const fs = require('fs');
 const { print: printV2 } = require('simple-node-ui');
 const { format, formatDistanceToNow } = require('date-fns');
 const prompt = require("prompt-sync")({ sigint: true });
@@ -77,7 +78,7 @@ const handleObjectSettings = (key, value, step) => {
   }
 }
 
-const stepColors = [ 'cyan', 'green', 'yellow', 'blue' ]
+const stepColors = ['cyan', 'green', 'yellow', 'blue']
 
 const settings = async (entries = null, step = 0) => {
   try {
@@ -92,15 +93,17 @@ const settings = async (entries = null, step = 0) => {
         entries = Object.entries(_settings[path].branches[currentBranch]);
       }
     }
-  
+
     entries.forEach(([key, value]) => {
       if (typeof value === 'object') {
         handleObjectSettings(key, value, step);
       } else {
         const width = 20 + (step * 2);
         const remain = getScreenWidth() - width;
-        if (key === 'createdAt') {
+        if (key === 'createdAt' || key === 'lastTouch') {
           value = format(new Date(value), 'MMM d, yyyy h:mm a');
+        }
+        if (key === 'createdAt') {
           const distance = formatDistanceToNow(new Date(value));
           print(`
           layout width:${width} align:right
@@ -109,7 +112,7 @@ const settings = async (entries = null, step = 0) => {
           layout leftPad:2 align:left width:${remain}
           style reset
           text "${distance}"
-        `);  
+        `);
         }
         print(`
           layout width:${width} align:right
@@ -128,12 +131,25 @@ const settings = async (entries = null, step = 0) => {
 }
 
 const listRepos = () => {
-  if (_args[1] && /^\d+$/.test(_args[1])) {
+  if (_args[1] === 'rm' && _args[2] && /^\d+$/.test(_args[2])) {
     const list = Object.keys(_settings);
-    const index = Math.min(list.length - 1, _args[1]);
+    const index = Math.min(list.length - 1, _args[2]);
+    printV2(`"Removed "  <style:bgBlue,white>  "${list[index]}"`);
+    delete _settings[list[index]];
+    write(rootSettings, _settings);
   } else {
-    Object.keys(_settings).forEach((item, idx) => {
-      console.log(` ${idx}.`, item.replace(process.env.HOME, '~'));
+    console.log();
+    Object.entries(_settings).forEach(([path, item], idx) => {
+      const existStyle = fs.existsSync(path) ? 'green' : 'red';
+      const distance = item.lastTouch ? formatDistanceToNow(new Date(item.lastTouch)) : '';
+      printV2(`
+        <width:5 rightSpace:2>
+        "${idx}."
+        <width:.6 rightSpace:0 style:${existStyle}>
+        "${path.replace(process.env.HOME, '~')}"
+        <leftSpace:4 style:reset,cyan>
+        "${distance}"
+      `);
     });
   }
 }
@@ -234,29 +250,27 @@ const writeStatusDetail = (title, data, style) => {
 const status = async () => {
   const currentBranch = await getCurrentBranch();
   const parentBranch = getParentBranch(currentBranch);
-  if (parentBranch) {
-    const overview = await execCmd(`git diff ${parentBranch}...${currentBranch} --stat | tail -n1`);
-    print(`
-      nl
-      layout width:max align:center
-      style bgGreen black
-      text "${overview || 'No changes detected.'}"
-      nl
-      nl
-      nl
-    `);
 
-    const deleted = (await execCmd(`git ls-files -d`)).split('\n');
+  const cmd = currentBranch === _settings[path].defaultBranch
+    ? `git diff --stat | tail -n1`
+    : `git diff ${parentBranch}...${currentBranch} --stat | tail -n1`;
 
-    const modifiedRaw = (await execCmd(`git ls-files -m`)).split('\n');
-    const modified = modifiedRaw.filter((item) => (!deleted.includes(item)));
-    const untracked = (await execCmd(`git ls-files --others --exclude-standard`)).split('\n');
+  const overview = await execCmd(cmd);
+  printV2(`
+    <nl width:max align:center style:bgGreen,black>
+    "${overview || 'No changes detected.'}"
+    <nl:2>
+  `);
 
-    writeStatusDetail('Modified', modified, `bgMagenta white`);
-    writeStatusDetail('Deleted', deleted, `bgRed white`);
-    writeStatusDetail('Untracked', untracked, `bgBlack white`);
+  const deleted = (await execCmd(`git ls-files -d`)).split('\n');
+  const modifiedRaw = (await execCmd(`git ls-files -m`)).split('\n');
+  const modified = modifiedRaw.filter((item) => (!deleted.includes(item)));
+  const untracked = (await execCmd(`git ls-files --others --exclude-standard`)).split('\n');
 
-  }
+  writeStatusDetail('Modified', modified, `bgMagenta white`);
+  writeStatusDetail('Deleted', deleted, `bgRed white`);
+  writeStatusDetail('Untracked', untracked, `bgBlack white`);
+
 }
 
 const getParentBranch = (currentBranch) => _settings?.[path]?.branches?.[currentBranch]?.parent ?? '';
@@ -623,6 +637,9 @@ const main = async () => {
   } else if (!cmd) {
     listBranches();
   }
+
+  _settings[path].lastTouch = new Date().toISOString();
+  write(rootSettings, _settings);
 
 }
 
