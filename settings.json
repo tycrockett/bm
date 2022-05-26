@@ -1,6 +1,13 @@
 {
   "/Users/crockettty/bm": {
-    "defaultBranch": "main"
+    "defaultBranch": "main",
+    "branches": {
+      "test": {
+        "parent": "main",
+        "createdAt": "2022-05-26T23:25:50.976Z"
+      }
+    },
+    "lastBranch": "test"
   },
   "/Users/crockettty/projects/brite/employee-view": {
     "defaultBranch": "main",
@@ -12,7 +19,12 @@
   },
   "/Users/crockettty/projects/brite/admin-frontend": {
     "defaultBranch": "master",
-    "branches": {},
+    "branches": {
+      "tc": {
+        "parent": "master",
+        "createdAt": "2022-05-26T23:21:47.595Z"
+      }
+    },
     "lastBranch": "master"
   },
   "/Users/crockettty/projects/personal/fin-api/functions/plaid": {

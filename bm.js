@@ -324,10 +324,10 @@ const push = async () => {
   }
 }
 
-const AddCommitPush = async () => {
+const AddCommitPush = async (des = '') => {
   try {
-    if (_args.length > 0) {
-      const description = _args.slice(1).join(' ');
+    if (_args.length > 0 || des) {
+      const description = des || _args.slice(1).join(' ');
       await execCmd(`git add .`);
       await execCmd(`git commit -m "${description}"`);
       await push();
@@ -523,6 +523,22 @@ const renameBranch = async () => {
   console.log();
 }
 
+const removeFile = async () => {
+
+  if (_args[1]) {
+    try {
+      await execCmd(`git rm -r --cached ${_args[1]}`);
+      await AddCommitPush(`Removed ${_args[1]}`);
+    } catch (err) {
+      console.log(err);
+    }
+  } else {
+    printV2(`<nl leftSpace:4>"Missing file arg"<nl>`)
+  }
+
+
+}
+
 const main = async () => {
 
   const cmd = _args[0];
@@ -581,6 +597,8 @@ const main = async () => {
     checkoutBranch();
   } else if (cmd === 'co-' || cmd === 'checkout-') {
     checkoutBranch(_settings[path]?.lastBranch);
+  } else if (cmd === 'rm' || cmd === 'remove') {
+    removeFile();
   } else if (cmd === 'parent-branch') {
     const current = await getCurrentBranch();
     const parent = getParentBranch(current);
