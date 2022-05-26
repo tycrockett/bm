@@ -754,6 +754,22 @@ const help = (cmd = null) => {
       nl
     `);
   }
+  if (cmd === null || cmd === 'rm' || cmd === 'remove') {
+    print(`
+      layout width:.3 align:right rightPad:2
+      style reset
+      text "rm | remove"
+      style bright cyan
+      layout width:.7 align:left leftPad:2
+      text "git rm -r --cached {filepath}"
+      nl
+      layout width:.3 align:right rightPad:2
+      style reset dim
+      text "{filepath}"
+      nl
+      nl
+    `);
+  }
   if (cmd === null || cmd === 'r' || cmd === 'remote') {
     print(`
       layout width:.3 align:right rightPad:2
