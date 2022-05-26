@@ -86,7 +86,7 @@ const settings = async (entries = null, step = 0) => {
       const currentBranch = await getCurrentBranch();
       console.log();
       if (_settings[path].defaultBranch === currentBranch) {
-        // printV2(`"Settings for "<style:bgBlue,white>"${path}"<nl>`)
+        printV2(`"Settings for "<style:bgBlue,white>"${path}"<nl>`)
         entries = Object.entries(_settings[path]);
       } else {
         entries = Object.entries(_settings[path].branches[currentBranch]);

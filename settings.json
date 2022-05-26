@@ -12,13 +12,8 @@
   },
   "/Users/crockettty/projects/brite/admin-frontend": {
     "defaultBranch": "master",
-    "branches": {
-      "tc-god-mode": {
-        "parent": "master",
-        "createdAt": "2022-05-26T19:25:44.700Z"
-      }
-    },
-    "lastBranch": "tc-god-mode"
+    "branches": {},
+    "lastBranch": "master"
   },
   "/Users/crockettty/projects/personal/fin-api/functions/plaid": {
     "defaultBranch": "main",
