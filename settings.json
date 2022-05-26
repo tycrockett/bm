@@ -1,0 +1,58 @@
+{
+  "/Users/crockettty/bm": {
+    "defaultBranch": "main"
+  },
+  "/Users/crockettty/projects/brite/employee-view": {
+    "defaultBranch": "main",
+    "branches": {},
+    "lastBranch": "main"
+  },
+  "/Users/crockettty/projects/personal/candlesticks": {
+    "defaultBranch": "main"
+  },
+  "/Users/crockettty/projects/brite/admin-frontend": {
+    "defaultBranch": "master",
+    "branches": {
+      "tc-god-mode": {
+        "parent": "master",
+        "createdAt": "2022-05-26T19:25:44.700Z"
+      }
+    },
+    "lastBranch": "tc-god-mode"
+  },
+  "/Users/crockettty/projects/personal/fin-api/functions/plaid": {
+    "defaultBranch": "main",
+    "branches": {},
+    "lastBranch": "main"
+  },
+  "/Users/crockettty/projects/personal/fin-api": {
+    "defaultBranch": "main",
+    "branches": {
+      "test": {
+        "parent": "main",
+        "createdAt": "2022-05-20T18:43:03.313Z"
+      }
+    },
+    "lastBranch": "test"
+  },
+  "/Users/crockettty/projects/personal/fin-client": {
+    "defaultBranch": "main",
+    "branches": {
+      "clean": {
+        "parent": "main",
+        "createdAt": "2022-05-18T00:27:44.288Z"
+      },
+      "groups": {
+        "parent": "main",
+        "createdAt": "2022-05-20T19:17:58.096Z"
+      }
+    },
+    "lastBranch": "groups"
+  },
+  "/Users/crockettty/projects/personal/nodeUI": {
+    "defaultBranch": "main"
+  },
+  "/Users/crockettty/projects/personal/simple-node-ui": {
+    "defaultBranch": "main"
+  }
+}
