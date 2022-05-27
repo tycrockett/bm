@@ -27,7 +27,6 @@ const initBm = () => {
       text "${path}"
       nl
       nl
-      nl
     `);
     const defaultBranch = prompt('Default Branch: (main) ') || 'main';
 
@@ -40,7 +39,6 @@ const initBm = () => {
       style reset
       text "has already been set up."
       nl
-      nl
       text "Use "
       style green
       text "bm settings"
@@ -52,7 +50,6 @@ const initBm = () => {
       text "bm settings -e"
       style reset
       text " to edit settings."
-      nl
       nl
     `)
   }
@@ -132,7 +129,7 @@ const settings = async (entries = null, step = 0) => {
 
 const listRepos = () => {
 
-  const list = Object.entries(_settings).sort(([a], [b]) => (a.localeCompare(b)));
+  const list = Object.entries(_settings).sort(([a,_a], [b,_b]) => (a.localeCompare(b)));
 
   if (_args[1] === 'rm' && _args[2] && /^\d+$/.test(_args[2])) {
     const index = Math.min(list.length - 1, _args[2]);
@@ -163,10 +160,11 @@ const listRepos = () => {
         "${idx}."
         <width:.6 rightSpace:0 style:${existStyle}>
         "${path.replace(process.env.HOME, '~')}"
-        <leftSpace:4 style:reset,cyan leftSpace:2>
+        <leftSpace:4 style:reset,cyan leftSpace:2 width:min>
         "${distance}"
       `);
     });
+    console.log();
   }
 }
 
@@ -219,7 +217,6 @@ const createNewBranch = async () => {
       text "bm n "
       style reset
       text "branch"
-      nl
       nl
       nl
     `);
@@ -593,6 +590,10 @@ const main = async () => {
     if (value) {
       console.log(`cd ${value}`);
     }
+    return;
+  } else if (cmd === 'help') {
+    help();
+    return;
   } 
 
   if (!(path in _settings)) {
@@ -603,7 +604,6 @@ const main = async () => {
       text "bm init"
       style reset
       text " before you can use other commands."
-      nl
       nl
       nl
     `);
@@ -618,12 +618,12 @@ const main = async () => {
     renameBranch();
   } else if (cmd === 's' || cmd === 'status') {
     status();
-  } else if (cmd === 'd' || cmd === 'delete') {
-    deleteBranch();
   } else if (cmd === 'p' || cmd === 'push') {
     push();
   } else if (cmd === 'r' || cmd === 'remote') {
     remote();
+  } else if (cmd === 'd' || cmd === 'delete') {
+    deleteBranch();
   } else if (cmd === 'c' || cmd === 'clear') {
     clearBranch();
   } else if (cmd === 'co' || cmd === 'checkout') {
@@ -646,8 +646,6 @@ const main = async () => {
     logCommits();
   } else if (cmd === '.') {
     AddCommitPush();
-  } else if (cmd === 'help') {
-    help();
   } else if (cmd === 'prune') {
     prune();
   } else if (cmd === 'has-remote') {
@@ -681,7 +679,6 @@ const help = (cmd = null) => {
       layout width:.7 align:left leftPad:7
       text "< flags >"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'n' || cmd === 'new') {
@@ -696,7 +693,6 @@ const help = (cmd = null) => {
       layout width:.3 align:right rightPad:2
       style reset dim
       text "{branch-name}"
-      nl
       nl
     `);
   }
@@ -716,7 +712,6 @@ const help = (cmd = null) => {
       layout width:.7 align:left leftPad:7
       text "< --remote | -r > rename remote github branch"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 's' || cmd === 'status') {
@@ -727,7 +722,6 @@ const help = (cmd = null) => {
       style bright cyan
       layout width:.7 align:left leftPad:2
       text "git status"
-      nl
       nl
     `);
   }
@@ -744,7 +738,6 @@ const help = (cmd = null) => {
       style reset dim
       text "{description}"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'c' || cmd === 'clear') {
@@ -755,7 +748,6 @@ const help = (cmd = null) => {
       style bright cyan
       layout width:.7 align:left leftPad:2
       text "Clears any uncommitted changes: git add . / git stash"
-      nl
       nl
     `);
   }
@@ -772,7 +764,6 @@ const help = (cmd = null) => {
       style reset dim
       text "optional: {branch}"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'p' || cmd === 'push') {
@@ -786,7 +777,6 @@ const help = (cmd = null) => {
       style reset
       layout leftPad:${emptyLeft}
       text "< --set-upsteam | -su > set remote github branch"
-      nl
       nl
     `);
   }
@@ -803,7 +793,6 @@ const help = (cmd = null) => {
       style reset dim
       text "{filepath}"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'r' || cmd === 'remote') {
@@ -815,7 +804,6 @@ const help = (cmd = null) => {
       layout width:.7 align:left leftPad:2
       text "Open remote github branch in browser"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'l' || cmd === 'list') {
@@ -826,7 +814,6 @@ const help = (cmd = null) => {
       style bright cyan
       layout width:.7 align:left leftPad:2
       text "List all branches with their associated number. (see git checkout)"
-      nl
       nl
     `);
   }
@@ -843,7 +830,6 @@ const help = (cmd = null) => {
       style reset dim
       text "{branch-name | branch-number}"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'co-' || cmd === 'checkout-') {
@@ -854,7 +840,6 @@ const help = (cmd = null) => {
       style bright cyan
       layout width:.7 align:left leftPad:2
       text "git checkout {last-branch}"
-      nl
       nl
     `);
   }
@@ -867,7 +852,6 @@ const help = (cmd = null) => {
       layout width:.7 align:left leftPad:2
       text "Display parent branch."
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'u' || cmd === 'update') {
@@ -878,7 +862,6 @@ const help = (cmd = null) => {
       style bright cyan
       layout width:.7 align:left leftPad:2
       text "Pulls parent branch / Merges parent branch"
-      nl
       nl
     `);
   }
@@ -891,7 +874,6 @@ const help = (cmd = null) => {
       layout width:.7 align:left leftPad:2
       text "git log (clean)"
       nl
-      nl
     `);
   }
   if (cmd === null || cmd === 'prune') {
@@ -902,7 +884,6 @@ const help = (cmd = null) => {
       style bright cyan
       layout width:.7 align:left leftPad:2
       text "git fetch -p / Reconciles local settings"
-      nl
       nl
     `);
   }
@@ -915,12 +896,10 @@ const help = (cmd = null) => {
       layout width:.7 align:left leftPad:2
       text "Return true/false if the current branch has a remote github branch"
       nl
-      nl
     `);
   }
   if (cmd === null) {
     print(`
-      nl
       nl
       layout leftPad:6
       style reset
