@@ -131,15 +131,26 @@ const settings = async (entries = null, step = 0) => {
 }
 
 const listRepos = () => {
+
+  const list = Object.entries(_settings).sort(([a], [b]) => (a.localeCompare(b)));
+
   if (_args[1] === 'rm' && _args[2] && /^\d+$/.test(_args[2])) {
-    const list = Object.keys(_settings);
     const index = Math.min(list.length - 1, _args[2]);
-    printV2(`"Removed "  <style:bgBlue,white>  "${list[index]}"`);
-    delete _settings[list[index]];
+    printV2(`"Removed "  <style:bgBlue,white>  "${list[index][0]}"`);
+    delete _settings[list[index][0]];
     write(rootSettings, _settings);
+  } if (_args[1] && /^\d+$/.test(_args[1])) {
+    const index = Math.min(list.length - 1, _args[1]);
+    return list[index][0];
+  } if (_args[1]) {
+    const path = list.find(([key]) => key.includes(_args[1]));
+    if (path) {
+      return path[0];
+    }
+
   } else {
     console.log();
-    Object.entries(_settings).forEach(([path, item], idx) => {
+    list.forEach(([path, item], idx) => {
       const existStyle = fs.existsSync(path) ? 'green' : 'red';
       const distance = item.lastTouch ? formatDistanceToNow(new Date(item.lastTouch)) : '';
       printV2(`
@@ -589,10 +600,15 @@ const main = async () => {
     return;
   }
 
+  let cdValue = '';
+
   if (cmd === 'settings') {
     settings();
   } else if (cmd === 'repos') {
-    listRepos();
+    const value = listRepos();
+    if (value) {
+      cdValue = `cd ${value}`;
+    }
   } else if (cmd === 'n' || cmd === 'new') {
     createNewBranch();
   } else if (cmd === 'rn' || cmd === 'rename') {
@@ -640,6 +656,10 @@ const main = async () => {
 
   _settings[path].lastTouch = new Date().toISOString();
   write(rootSettings, _settings);
+
+  if (cdValue) {
+    console.log(cdValue);
+  }
 
 }
 
@@ -914,6 +934,8 @@ const help = (cmd = null) => {
     `);
   }
 
+
+  process.chdir(`/Users/crockettty/projects`)
   console.log();
 
 }
