@@ -1,7 +1,7 @@
 require('./config');
 const fs = require('fs');
 const { print: printV2 } = require('simple-node-ui');
-const { format, formatDistanceToNow } = require('date-fns');
+const { format, formatDistanceToNow, differenceInDays } = require('date-fns');
 const prompt = require("prompt-sync")({ sigint: true });
 const { print, formats, getScreenWidth } = require('./node-ui');
 const { read, write } = require('./fs-utils');
@@ -151,14 +151,19 @@ const listRepos = () => {
   } else {
     console.log();
     list.forEach(([path, item], idx) => {
-      const existStyle = fs.existsSync(path) ? 'green' : 'red';
+      const days = item.lastTouch
+        ? Math.abs(differenceInDays(new Date(), new Date(item.lastTouch)))
+        : 10;
+      const existStyle = fs.existsSync(path)
+        ? days > 7 ? 'yellow' : 'green'
+        : 'red';
       const distance = item.lastTouch ? formatDistanceToNow(new Date(item.lastTouch)) : '';
       printV2(`
         <width:5 rightSpace:2>
         "${idx}."
         <width:.6 rightSpace:0 style:${existStyle}>
         "${path.replace(process.env.HOME, '~')}"
-        <leftSpace:4 style:reset,cyan>
+        <leftSpace:4 style:reset,cyan leftSpace:2>
         "${distance}"
       `);
     });
@@ -583,7 +588,12 @@ const main = async () => {
       console.log(err);
     }
     return;
-  }
+  } else if (cmd === 'repos') {
+    const value = listRepos();
+    if (value) {
+      console.log(`cd ${value}`);
+    }
+  } 
 
   if (!(path in _settings)) {
     print(`
@@ -600,15 +610,8 @@ const main = async () => {
     return;
   }
 
-  let cdValue = '';
-
   if (cmd === 'settings') {
     settings();
-  } else if (cmd === 'repos') {
-    const value = listRepos();
-    if (value) {
-      cdValue = `cd ${value}`;
-    }
   } else if (cmd === 'n' || cmd === 'new') {
     createNewBranch();
   } else if (cmd === 'rn' || cmd === 'rename') {
@@ -656,10 +659,6 @@ const main = async () => {
 
   _settings[path].lastTouch = new Date().toISOString();
   write(rootSettings, _settings);
-
-  if (cdValue) {
-    console.log(cdValue);
-  }
 
 }
 
