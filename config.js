@@ -17,4 +17,5 @@ global._flags = {
   HELP: flagCheck('--help'),
   CACHE: flagCheck('--cache'),
   HISTORY: flagCheck('--history'),
+  STASH: flagCheck('--stash'),
 }

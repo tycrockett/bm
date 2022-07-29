@@ -186,6 +186,9 @@ const getCurrentBranch = async () => {
 const createNewBranch = async () => {
   if (_args[1]) {
     try {
+      if (_flags.STASH) {
+        await execCmd(`git stash`);
+      }
       const currentBranch = await getCurrentBranch();
       const hasRemote = await hasRemoteBranch(currentBranch);
       if (hasRemote) {
@@ -204,6 +207,9 @@ const createNewBranch = async () => {
       }
       write(rootSettings, _settings);
       await execCmd(`git checkout ${_args[1]}`);
+      if (_flags.STASH) {
+        await execCmd(`git stash apply`);
+      }
     } catch (err) {
       console.log(err);
     }
